@@ -119,7 +119,11 @@ module.exports = function (config) {
   });
 
   apiRouter.use(function (req, res, next) {
-    var token = req.headers["authorization"].replace("Bearer ", "");
+    var token = req.headers["authorization"]
+      ? req.headers["authorization"].replace("Bearer ", "")
+      : req.headers["X-Access-Token"]
+      ? req.headers["X-Access-Token"]
+      : undefined;
 
     if (token) {
       jwt.verify(
