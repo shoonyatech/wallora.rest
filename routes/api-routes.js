@@ -119,30 +119,28 @@ module.exports = function (config) {
   });
 
   apiRouter.use(function (req, res, next) {
-    var token = req.headers["authorization"]
-      ? req.headers["authorization"].replace("Bearer ", "")
-      : req.headers["x-access-token"]
+    var isV1 = req.headers["x-access-token"] != null;
+    var token = isV1
       ? req.headers["x-access-token"]
-      : undefined;
+      : req.headers["authorization"].replace("Bearer ", "");
 
     if (token) {
-      jwt.verify(
-        token,
-        process.env.SECRET || config.secret,
-        function (err, decoded) {
-          console.log("############", err, decoded);
+      var secret = isV1
+        ? process.env.V1_SECRET || config.v1Secret
+        : process.env.V2_SECRET || config.v2Secret;
+      jwt.verify(token, secret, function (err, decoded) {
+        console.log("############", err, decoded);
 
-          if (err) {
-            return res.json({
-              success: false,
-              message: "Failed to authenticate token.",
-            });
-          } else {
-            req.decoded = decoded;
-            next();
-          }
+        if (err) {
+          return res.json({
+            success: false,
+            message: "Failed to authenticate token.",
+          });
+        } else {
+          req.decoded = decoded;
+          next();
         }
-      );
+      });
     } else {
       return res.status(403).send({
         success: false,
