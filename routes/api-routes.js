@@ -119,6 +119,8 @@ module.exports = function (config) {
   });
 
   apiRouter.use(function (req, res, next) {
+    console.log("authorization token: ", req.headers["authorization"]);
+    console.log("x-access-token: ", req.headers["x-access-token"]);
     var isV1 = req.headers["x-access-token"] != null;
     var token = isV1
       ? req.headers["x-access-token"]
