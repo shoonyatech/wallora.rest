@@ -130,6 +130,9 @@ module.exports = function (config) {
       var secret = isV1
         ? process.env.V1_SECRET || config.v1Secret
         : process.env.V2_SECRET || config.v2Secret;
+        console.log("Is v1: ", isV1);
+        console.log("Secret: ", secret);
+
       jwt.verify(token, secret, function (err, decoded) {
         console.log("############", err, decoded);
 
