@@ -121,7 +121,7 @@ module.exports = function (config) {
   apiRouter.use(function (req, res, next) {
     console.log("authorization token: ", req.headers["authorization"]);
     console.log("x-access-token: ", req.headers["x-access-token"]);
-    var isV1 = req.headers["x-access-token"] != null;
+    var isV1 = req.headers["x-access-token"] != null && req.headers["x-access-token"].length > 0;
     var token = isV1
       ? req.headers["x-access-token"]
       : req.headers["authorization"].replace("Bearer ", "");
@@ -139,7 +139,10 @@ module.exports = function (config) {
             message: "Failed to authenticate token.",
           });
         } else {
-          req.decoded = decoded;
+          if(!decoded.username) {
+            decoded.username = decoded['https://wallora.com/email']
+          }
+          req.decoded = { ...decoded};
           next();
         }
       });
